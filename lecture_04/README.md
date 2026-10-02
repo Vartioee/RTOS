@@ -1,11 +1,11 @@
-# Lecture 04: FreeRTOS Task Allocation
+# Lecture 04: FreeRTOS Task Memory Allocation
 
 ## Answers
 
 ### a. Did the free heap change when you increased the task stack size?
 
 Yes. The `8192_stack.png` run ends with 340,484 bytes free, while the
-`4096_stack.png` run ends with 348,932 bytes free. That is 8,448 fewer free bytes with the larger stack.
+`4096_stack.png` run ends with 348,932 bytes free. That is 8,448 fewer freebytes with the larger stack.
 
 ### b. What happened to the free heap?
 
