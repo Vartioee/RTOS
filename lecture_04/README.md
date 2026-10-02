@@ -1,4 +1,4 @@
-# Lecture 04: FreeRTOS Task Memory
+# Lecture 04: FreeRTOS Task Allocation
 
 ## Answers
 
