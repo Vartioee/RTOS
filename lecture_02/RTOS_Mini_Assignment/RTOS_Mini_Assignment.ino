@@ -21,7 +21,7 @@ void setup() {
   Serial.begin(115200); 
   delay(500); 
  
-  xTaskCreatePinnedToCore(taskA, "Task A", 2048, NULL, 1, NULL, 1); 
+  xTaskCreatePinnedToCore(taskA, "Task A", 2048, NULL, 2, NULL, 1); 
   xTaskCreatePinnedToCore(taskB, "Task B", 2048, NULL, 1, NULL, 1); 
 } 
  
