@@ -11,3 +11,6 @@ Think of the mutex as a single physical key. The new task takes the key first. T
 
 ## Why is this described as a demonstration hack? What would be a better design in a real application?
 Mutexes are designed to protect shared data from being edited by two tasks at the same time, not to act as a one-time "wait" signal. In a real application, a better design would be to use a permanent global variable, allocate permanent memory for the value, or use a tool actually designed for signaling and waiting.
+
+
+![Serial Monitor Screenshot](serialoutput.png)

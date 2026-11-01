@@ -21,7 +21,7 @@ void startTask(TaskFunction_t fn, const char *name, void *arg) {
 // Inspired by Shawn Hymel / DigiKey Introduction to RTOS Part 7 challenge.
 // Newly written scaffold: stable arguments and automatic frequency checking.
 static const int CAPACITY=5, PRODUCERS=5, WRITES=3, CONSUMERS=2;
-static const uint32_t PRODUCER_DELAY_MS=100, CONSUMER_DELAY_MS=400;
+static const uint32_t PRODUCER_DELAY_MS=100, CONSUMER_DELAY_MS=1500;
 static const uint32_t TEST_TIMEOUT_MS=30000;
 static int buffer[CAPACITY], head=0, tail=0, consumed=0;
 static int counts[PRODUCERS]={0}, invalidValues=0;
@@ -32,33 +32,40 @@ SemaphoreHandle_t emptySlots, filledSlots, bufferMutex, allConsumed;
 bool createObjects() {
   // TODO 1: create emptySlots, filledSlots and bufferMutex.
   // Think: the buffer starts empty. What are the two initial counts?
-  emptySlots = xSemaphoreCreateCounting(CAPACITY, CAPACITY);
-  filledSlots = xSemaphoreCreateCounting(CAPACITY, 0);
+  emptySlots = xSemaphoreCreateCounting(CAPACITY, CAPACITY); // Max 5, starts at 5
+  filledSlots = xSemaphoreCreateCounting(CAPACITY, 0);       // Max 5, starts at 0
   bufferMutex = xSemaphoreCreateMutex();
-  allConsumed=xSemaphoreCreateBinary(); // Test-completion signal is provided.
+  
+  allConsumed = xSemaphoreCreateBinary();
   return emptySlots && filledSlots && bufferMutex && allConsumed;
 }
+
 void putValue(int value) {
-  // TODO 2: wait for a free slot, then obtain the mutex.
+  // TODO 2: Wait for space, then lock the buffer
   xSemaphoreTake(emptySlots, portMAX_DELAY);
   xSemaphoreTake(bufferMutex, portMAX_DELAY);
+  
   buffer[head]=value;
   head=(head+1)%CAPACITY;
-  // TODO 3: release mutex, then signal one filled slot.
+  
+  // TODO 3: Unlock the buffer, then signal a filled slot
   xSemaphoreGive(bufferMutex);
   xSemaphoreGive(filledSlots);
 }
+
 void getValue(int consumerId) {
-  // TODO 4: wait for a filled slot, then obtain the mutex.
+  // TODO 4: Wait for data, then lock the buffer
   xSemaphoreTake(filledSlots, portMAX_DELAY);
   xSemaphoreTake(bufferMutex, portMAX_DELAY);
+  
   int value=buffer[tail];
   tail=(tail+1)%CAPACITY;
   if (value>=0 && value<PRODUCERS) ++counts[value]; else ++invalidValues;
   ++consumed;
   Serial.printf("Consumer %d read %d (total=%d)\n",consumerId,value,consumed);
   if (consumed==PRODUCERS*WRITES) xSemaphoreGive(allConsumed);
-  // TODO 5: release mutex, then signal one empty slot.
+  
+  // TODO 5: Unlock the buffer, then signal an empty slot
   xSemaphoreGive(bufferMutex);
   xSemaphoreGive(emptySlots);
 }
